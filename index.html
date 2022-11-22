@@ -1,0 +1,106 @@
+<!DOCTYPE html><!-- indica que pode usar tags do HTML5-->
+<html lang="en">
+<head>
+    <title>Exemplo CRUD</title>
+</head>
+<body>
+    <h1>Exemplo CRUD usando a api back-end.</h1>
+    <input type="hidden" id="id">
+    Nome:<br>
+    <input type="text" placeholder= "Nome da pessoa" id="nome"><br>
+    Email:<br>
+    <input type="text" id="email"><br>
+    <input type="button" value="Gravar" onclick="incluir()" >
+    <input type="button" value="Novo" onclick="limpar()" >
+    <input type="button" value="Apagar" onclick="apagar()" >
+    <div id='lista'>minha DIV onde vamos colocar a lista de API</div>
+    <script>
+       
+        
+       // request via java script ajax 4 passos
+        //01 criar variável
+        
+        ajax = new XMLHttpRequest();
+        var lista;
+        
+        function listar(){
+            //definição do  nosso request (endereço e forma)
+        ajax.open("GET", "http://elismar.herokuapp.com/api/usuario/");
+         // manda de fato a request
+         ajax.send();
+        
+        
+        // execução quando tiver a devolutiva do request
+        ajax.onload = function(){
+            lista = this.responseText;
+            console.log(lista);
+            lista = JSON.parse(lista);
+            
+            texto = "Lista de Pessoas<br>";
+            i =0;
+
+            for (const u of lista) {
+                texto += `${u.nome} - ${u.email} - <span onclick = 'editar(${i})'>✍ </span> <br>`;
+                i++;
+            }
+            document.getElementById('lista').innerHTML = texto;
+        }
+        }
+        listar();
+
+        function incluir(){
+            //alert("Estamos dentro da function incluir");
+            var usuario = {};
+            usuario.nome = document.getElementById("nome").value;
+            usuario.email = document.getElementById("email").value;
+            //console.log(usuario);
+
+            usuario.id = document.getElementById("id").value
+            if(usuario.id > 0){
+                metodo = "PUT";
+            }else{
+                metodo = "POST";
+            }
+
+            ajax.open(metodo, "http://elismar.herokuapp.com/api/usuario/");
+            ajax.setRequestHeader("Content-Type","application/json;charset=UTF8");
+
+            ajax.send(JSON.stringify(usuario));
+            
+            ajax.onload = function(){
+                console.log(this.responseText);
+                listar();
+                limpar();
+            }
+
+            
+        }
+
+        function limpar(){
+                document.getElementById("nome").value= "";
+                document.getElementById("email").value= "";
+                document.getElementById("id").value = "";
+            }
+
+        function editar(i){
+            u= lista[i];
+
+            document.getElementById("nome").value= u.nome;
+            document.getElementById("email").value= u.email;
+            document.getElementById("id").value= u.id;
+        }
+       
+        function apagar(){
+            id = document.getElementById("id").value;
+            ajax.open("DELETE","http://elismar.herokuapp.com/api/usuario/"+id);
+            ajax.send();
+            ajax.onload = function(){
+                alert(this.responseText);
+                listar();
+                limpar();
+            }
+        }
+        listar(); 
+    </script>
+</body>
+</html>

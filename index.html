@@ -2,19 +2,52 @@
 <html lang="en">
 <head>
     <title>Exemplo CRUD</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
 </head>
 <body>
-    <h1>Exemplo CRUD usando a api back-end.</h1>
+    <style>
+        tbody{
+            cursor: pointer;
+        }
+    </style>
+
+ <div class="container">
+    <h1>Exemplo CRUD usando a api back-end e bootstrap</h1>
     <input type="hidden" id="id">
-    Nome:<br>
-    <input type="text" placeholder= "Nome da pessoa" id="nome"><br>
-    Email:<br>
-    <input type="text" id="email"><br>
-    <input type="button" value="Gravar" onclick="incluir()" >
-    <input type="button" value="Novo" onclick="limpar()" >
-    <input type="button" value="Apagar" onclick="apagar()" >
-    <div id='lista'>minha DIV onde vamos colocar a lista de API</div>
+    
+    <label for="nome">Nome:</label>
+    <input type="text" id="nome" class="form-control">
+    <label for="email">Email:</label>
+    <input type="text" id="email" class="form-control">
+    <br>
+   
+    <input type="button" value="Gravar" onclick="incluir()" class=" btn btn-primary" >
+    <input type="button" value="Novo" onclick="limpar()" class=" btn btn-light" >
+    <input type="button" value="Apagar" onclick="apagar()" class=" btn btn-danger" >
+
+    <h4>Lista de Pessoas</h4>
+
+    <table class=" table table-hover">
+        <thead>
+            <tr>
+                <th>
+                    Nome:
+                </th>
+                <th>
+                    Email:
+                </th>
+            </tr>
+        </thead>
+       
+        <tbody id='lista'>
+
+        </tbody>
+    </table>
+</div>     
+    <div ></div>
     <script>
+     
        
         
        // request via java script ajax 4 passos
@@ -22,10 +55,10 @@
         
         ajax = new XMLHttpRequest();
         var lista;
-        
+        var api = "http://elismar.herokuapp.com/api/usuario/";
         function listar(){
             //definição do  nosso request (endereço e forma)
-        ajax.open("GET", "http://elismar.herokuapp.com/api/usuario/");
+        ajax.open("GET", api);
          // manda de fato a request
          ajax.send();
         
@@ -36,11 +69,11 @@
             console.log(lista);
             lista = JSON.parse(lista);
             
-            texto = "Lista de Pessoas<br>";
+            texto = "";
             i =0;
 
             for (const u of lista) {
-                texto += `${u.nome} - ${u.email} - <span onclick = 'editar(${i})'>✍ </span> <br>`;
+                texto += `<tr onclick = 'editar(${i})'><td>${u.nome}</td><td>${u.email}</td></tr>`;
                 i++;
             }
             document.getElementById('lista').innerHTML = texto;
@@ -62,7 +95,7 @@
                 metodo = "POST";
             }
 
-            ajax.open(metodo, "http://elismar.herokuapp.com/api/usuario/");
+            ajax.open(metodo, api);
             ajax.setRequestHeader("Content-Type","application/json;charset=UTF8");
 
             ajax.send(JSON.stringify(usuario));
@@ -92,7 +125,7 @@
        
         function apagar(){
             id = document.getElementById("id").value;
-            ajax.open("DELETE","http://elismar.herokuapp.com/api/usuario/"+id);
+            ajax.open("DELETE",api + id);
             ajax.send();
             ajax.onload = function(){
                 alert(this.responseText);
